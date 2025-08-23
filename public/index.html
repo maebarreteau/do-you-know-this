@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Do you know this ?</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo"><div class="cube"></div><h1>Do you know this ?</h1></div>
+      <nav id="filters"></nav>
+    </header>
+
+    <div class="grid">
+      
+      <aside class="panel">
+        <h2>Profil</h2>
+        <hr>
+<h2>Quête de la semaine</h2>
+<div id="quest" class="quest">
+  <p id="questText">Chargement...</p>
+  <p id="questStatus"></p>
+</div>
+
+        <div class="profile">
+          <div class="avatar"><span>🧸</span></div>
+          <div class="xp">
+            <div class="statline"><span>Niveau <b id="level">1</b></span>    <span><b id="xp">0</b> XP</span></div>
+            <div class="bar"><i id="xpbar"></i></div>
+            <div class="statline"><span>Vers niv. suivant</span><span id="toNext">0 XP</span></div>
+          </div>
+        </div>
+
+        <hr>
+
+        <h2>Ajouter une entrée</h2>
+        <form id="entryForm">
+          <div class="row">
+            <div>
+              <label for="type">Catégorie</label>
+              <select id="type" required>
+                <option value="film">🎬 Film</option>
+                <option value="livre">📚 Livre</option>
+                <option value="musique">🎧 Musique</option>
+                <option value="podcast">🎙️ Podcast</option>
+                <option value="jeu">🎲 Jeu de société</option>
+              </select>
+            </div>
+            <div>
+              <label for="date">Date</label>
+              <input id="date" type="date" />
+            </div>
+          </div>
+
+          <label for="title">Titre</label>
+          <input id="title" required />
+
+          <div class="row">
+            <div>
+              <label for="rating">Note (0–10)</label>
+              <input id="rating" type="number" min="0" max="10" step="0.5" />
+            </div>
+          </div>
+
+          <label for="comment">Commentaire</label>
+          <textarea id="comment"></textarea>
+
+          <div class="buttons">
+            <button class="btn" type="submit">+ Ajouter & gagner l'XP</button>
+            <button class="btn secondary" type="button" id="clearAll">Réinitialiser (local)</button>
+          </div>
+        </form>
+
+        <hr>
+
+        <h2>Badges</h2>
+        <div id="badges" class="badges"></div>
+      </aside>
+
+      <!-- Colonne droite: Liste -->
+      <section class="panel">
+        <h2>Mes entrées</h2>
+        <div id="entries" class="list"></div>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <p>Prototype carnet ludique – Sauvegarde locale uniquement</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
