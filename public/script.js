@@ -7,6 +7,31 @@ const XP_VALUES = {
   jeu: 40
 };
 
+const checkboxes = document.querySelectorAll('.category-checkbox');
+const entriesList = document.getElementById('list'); // ta liste d'entrées
+
+checkboxes.forEach(box => {
+  box.addEventListener('change', renderFilteredList);
+});
+
+function renderFilteredList() {
+  const selectedCategories = Array.from(checkboxes)
+    .filter(cb => cb.checked)
+    .map(cb => cb.value);
+
+  entriesList.innerHTML = '';
+
+  entries
+    .filter(e => selectedCategories.length === 0 || selectedCategories.includes(e.category))
+    .forEach(e => {
+      const li = document.createElement('li');
+      li.textContent = `${e.type} - ${e.title} (${e.category})`;
+      entriesList.appendChild(li);
+    });
+}
+
+
+
 const BADGES = [
   { id: "cinephile", text: "Cinéphile : 10 films", condition: (stats) => stats.film >= 10 },
   { id: "lecteur", text: "Lecteur assidu : 5 livres", condition: (stats) => stats.livre >= 5 },
@@ -27,7 +52,6 @@ const QUEST_BONUS = 50;
 
 // ==================== VARIABLES ====================
 let xp = parseInt(localStorage.getItem("xp") || "0");
-let entries = JSON.parse(localStorage.getItem("entries") || "[]");
 let unlockedBadges = JSON.parse(localStorage.getItem("badges") || "[]");
 
 // ==================== QUÊTE ====================
@@ -65,8 +89,26 @@ const badgesList = document.getElementById("badges");
 const questTextEl = document.getElementById("questText");
 const questStatusEl = document.getElementById("questStatus");
 
-function renderList() {
+async function renderList() {
   list.innerHTML = "";
+
+  let token = localStorage.getItem("token");
+  if(!token) return;
+
+  const res = await fetch('/entries', {
+    method: 'GET',
+    headers: {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
+  })
+
+  if(res.status !== 200) {
+    alert("Erreur lors de la récupération des entrées. Veuillez vous reconnecter.");
+    localStorage.removeItem("token");
+    window.location.href = '/login';
+    return;
+  }
+
+  entries = await res.json();
+
   entries.forEach(e => {
     const li = document.createElement("li");
     li.textContent = `${e.type} : ${e.title} (${e.date})`;
@@ -81,7 +123,7 @@ function updateXPUI() {
 
 function updateBadges() {
   const stats = {film:0, livre:0, podcast:0, musique:0, jeu:0};
-  entries.forEach(e => stats[e.type]++);
+  //entries.forEach(e => stats[e.type]++);
 
   BADGES.forEach(b => {
     if(b.condition(stats) && !unlockedBadges.includes(b.id)){
@@ -110,23 +152,26 @@ function renderQuest() {
 }
 
 // ==================== AJOUT D'ENTRÉE ====================
-form.addEventListener("submit", e => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const type = document.getElementById("type").value;
   const title = document.getElementById("title").value;
+  const comment = document.getElementById("comment").value
   if(!title) return;
 
-  const entry = {type, title, date:new Date().toLocaleDateString()};
-  entries.push(entry);
-  xp += XP_VALUES[type];
+  const entry = {type, title, date:new Date().toLocaleDateString(), comment};
 
-  // Vérifie la quête
-  if(!questDone && type === currentQuest.type){
-    xp += QUEST_BONUS;
-    questDone = true;
-    localStorage.setItem("questDone","true");
-    alert("🎉 Quête réussie ! +50 XP bonus");
-  }
+  let token = localStorage.getItem("token");
+  if(!token) return;
+
+  const res = await fetch('/entries', {
+    method: 'POST',
+    headers: {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'},
+    body: json.stringify(entry)
+  })
+
+  // TODO
+  // handle response
 })
 
 const clearBtn = document.getElementById("clearAll");

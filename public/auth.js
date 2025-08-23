@@ -30,6 +30,10 @@ loginBtn.addEventListener("click", async () => {
 
   const res = await postData('/login', { username, password });
   authMsg.textContent = res.message;
+  
+    if(res.token){
+        localStorage.setItem("token", res.token);
+    }
 
   if(res.message === "Connexion réussie !"){
     setTimeout(() => window.location.href = '/', 500);

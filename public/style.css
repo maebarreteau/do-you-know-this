@@ -57,3 +57,25 @@ footer {text-align:center; font-size:12px; margin-top:12px; opacity:0.7;}
   border-color: var(--accent-2);
   color: var(--accent-2);
 }
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;       /* aligne verticalement la checkbox et le texte */
+  gap: 8px;                  /* espace entre case et texte */
+  cursor: pointer;
+  color: #333;
+  font-weight: 500;
+}
+
+.category-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;            /* empêche la case de rétrécir */
+}
