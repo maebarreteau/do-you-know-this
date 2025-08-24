@@ -1,11 +1,7 @@
 // ==================== CONFIG ====================
-const XP_VALUES = {
-  film: 30,
-  livre: 50,
-  podcast: 10,
-  musique: 20,
-  jeu: 40
-};
+// TODO
+// Implement this on server side
+
 
 document.querySelector('.dropdown-btn').addEventListener('click', function() {
   document.querySelector('.dropdown-multi').classList.toggle('show');
@@ -27,8 +23,6 @@ function renderFilteredList() {
     });
 }
 
-
-
 const BADGES = [
   { id: "cinephile", text: "Cinéphile : 10 films", condition: (stats) => stats.film >= 10 },
   { id: "lecteur", text: "Lecteur assidu : 5 livres", condition: (stats) => stats.livre >= 5 },
@@ -37,41 +31,11 @@ const BADGES = [
     condition: (stats) => Object.values(stats).every(v => v > 0) }
 ];
 
-const QUESTS = [
-  {id:"film", text:"Regarder un film", type:"film"},
-  {id:"livre", text:"Lire un livre", type:"livre"},
-  {id:"podcast", text:"Écouter un podcast", type:"podcast"},
-  {id:"musique", text:"Découvrir une musique", type:"musique"},
-  {id:"jeu", text:"Jouer à un jeu de société", type:"jeu"}
-];
-
-const QUEST_BONUS = 50;
-
 // ==================== VARIABLES ====================
-let xp = parseInt(localStorage.getItem("xp") || "0");
 let unlockedBadges = JSON.parse(localStorage.getItem("badges") || "[]");
-
-// ==================== QUÊTE ====================
-function getWeekNumber(d=new Date()) {
-  const onejan = new Date(d.getFullYear(),0,1);
-  return Math.ceil((((d - onejan) / 86400000) + onejan.getDay()+1)/7);
-}
-
-let week = getWeekNumber();
-let currentQuest = QUESTS[week % QUESTS.length];
-
-// Définir questDone et reset si semaine changée
-let questDone = localStorage.getItem("questDone") === "true";
-let savedWeek = parseInt(localStorage.getItem("week") || "0");
-if(savedWeek !== week){
-  questDone = false;
-  localStorage.setItem("questDone","false");
-  localStorage.setItem("week", week);
-}
 
 // ==================== HELPERS ====================
 function save() {
-  localStorage.setItem("xp", xp);
   localStorage.setItem("entries", JSON.stringify(entries));
   localStorage.setItem("badges", JSON.stringify(unlockedBadges));
 }
@@ -113,10 +77,19 @@ async function renderList() {
   });
 }
 
-function updateXPUI() {
-  xpSpan.textContent = xp;
-  levelSpan.textContent = Math.floor(xp / 100) + 1;
+const xpBar = document.getElementById("xpbar");
+
+function updateXPUI(newXP) {
+  xpSpan.textContent = newXP;
+  const level = Math.floor(newXP / 100) + 1;
+  levelSpan.textContent = level;
+
+  // calculer XP actuel dans le niveau
+  const xpInLevel = newXP % 100; 
+  const percent = (xpInLevel / 100) * 100; // % pour la barre
+  xpBar.style.width = percent + "%";
 }
+
 
 function updateBadges() {
   const stats = {film:0, livre:0, podcast:0, musique:0, jeu:0};
@@ -138,11 +111,27 @@ function updateBadges() {
   });
 }
 
-function renderQuest() {
-  questTextEl.textContent = "🎯 Objectif : " + currentQuest.text;
-  if (questDone) {
+async function renderQuest() {
+  const res = await fetch('/quest', {
+    method: 'GET',
+    headers: {'Authorization': 'Bearer ' + localStorage.getItem("token"), 'Content-Type': 'application/json'}
+  })
+  
+  if(res.status !== 200) {
+    alert("Erreur lors de la récupération de la quête. Veuillez vous reconnecter.");
+    localStorage.removeItem("token");
+    window.location.href = '/login';
+    return;
+  }
+
+  const data = await res.json();
+  currentQuest = data.quest;
+  questDone = data.done;
+
+  questTextEl.textContent = "🎯 Objectif : " + currentQuest.description;
+  if (data.done) {
     document.querySelector(".quest").classList.add("complete");
-    questStatusEl.textContent = "✅ Quête réussie ! (+50 XP)";
+    questStatusEl.textContent = "✅ Quête réussie ! (+" + currentQuest.reward + " XP)";
   } else {
     questStatusEl.textContent = "⏳ En attente...";
   }
@@ -172,11 +161,19 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  const newEntry = await res.json();
+  const response = await res.json();
 
   const li = document.createElement("li");
-  li.textContent = `${newEntry.category} : ${newEntry.title} (${newEntry.date})`;
+  li.textContent = `${response.category} : ${response.title} (${response.date})`;
   list.appendChild(li);
+
+  if(response.questDone) {
+    //alert("🎉 Quête accomplie ! Vous gagnez " + response.xpGained + " XP !");
+    document.querySelector(".quest").classList.add("complete");
+    questStatusEl.textContent = "✅ Quête réussie ! (+" + currentQuest.reward + " XP)";
+  }
+
+  updateXPUI(response.xpGained)
 })
 
 const clearBtn = document.getElementById("clearAll");
@@ -201,7 +198,7 @@ clearBtn.addEventListener("click", () => {
 
 // ==================== INIT ====================
 renderList();
-updateXPUI();
+updateXPUI(0);
 updateBadges();
 renderQuest();
 

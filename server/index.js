@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('./model/User');
 const Entry = require('./model/Entry')
+const Quest = require('./model/Quest');
 const app = express();
 const port = 3000;
 
@@ -9,6 +10,7 @@ const port = 3000;
 const JWT_SECRET = "monsecret123";
 
 let users = [];
+let actualQuest = new Quest("Regarder un film", 20, "film")
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -74,9 +76,28 @@ app.post("/entries", authenticateToken ,(req, res) => {
   if(!category || !title || !date) return res.status(400).json({ message: "Champs manquants." });
 
   const newEntry = new Entry(title, date, [], category, comment || "", 10);
+  const xpFromCategory = newEntry.getXPFromCategory();
+
   foundUser.addEntry(newEntry);
-  return res.status(201).json(newEntry);
+  foundUser.xp += xpFromCategory;
+
+  if(!foundUser.isWeeklyQuestDone && actualQuest.checkEntryValidQuest(newEntry))
+  {
+    foundUser.isWeeklyQuestDone = true;
+    foundUser.xp += actualQuest.reward;
+
+    return res.status(201).json({ ...newEntry, questDone: true, xpGained: foundUser.xp });
+  }
+
+  return res.status(201).json({...newEntry, questDone: false, xpGained: foundUser.xp });
 })
+
+app.get('/quest', authenticateToken, (req, res) => {
+  const foundUser = users.find(u => u.username === req.user.username);
+  if(!foundUser) return res.status(404).json({ message: "Utilisateur non trouvé." });
+
+  return res.status(200).json({ quest: actualQuest, done: foundUser.isWeeklyQuestDone });
+});
 
 // Middleware pour protéger les routes
 function authenticateToken(req, res, next) {
