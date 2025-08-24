@@ -67,7 +67,7 @@
 
        <label for="types">Genre</label>       
 <div class="dropdown-multi">
-  <button class="dropdown-btn">Sélectionner les genres</button>
+  <button type="button" class="dropdown-btn">Sélectionner les genres</button>
   <div class="dropdown-content">
     <label><input type="checkbox" value="sf" class="category-checkbox"> SF</label>
     <label><input type="checkbox" value="humour" class="category-checkbox"> Humour</label>
@@ -102,36 +102,37 @@
 
         <h2>Badges</h2>
         <div id="badges" class="badges"></div>
-        <div class="badges-container">
-  <div class="badge" id="badge-cinephile">
-    🎬 Cinéphile
-    <span class="badge-count">0/10</span>
+
+  <div class="badges-container">
+    <div class="badge" id="cinephile">
+      🎬 Cinéphile
+      <span class="badge-count">0/10</span>
+    </div>
+    <div class="badge" id="lecteur">
+      📚 Lecteur assidu
+      <span class="badge-count">0/5</span>
+    </div>
+    <div class="badge" id="podcast">
+      🎙️ Explorateur de podcasts
+      <span class="badge-count">0/20</span>
+    </div>
+    <div class="badge" id="collectionneur">
+      🏆 Collectionneur
+      <span class="badge-count">0/5</span>
+    </div>
+    <div class="badge" id="melomane">
+      🎧 Mélomane
+      <span class="badge-count">0/15</span>
+    </div>
+    <div class="badge" id="geek">
+      🎮 Geek
+      <span class="badge-count">0/10</span>
+    </div>
+    <div class="badge" id="joueur>">
+      🎲 Maître du jeu
+      <span class="badge-count">0/7</span>
+    </div>
   </div>
-  <div class="badge" id="badge-lecteur">
-    📚 Lecteur assidu
-    <span class="badge-count">0/5</span>
-  </div>
-  <div class="badge" id="badge-podcast">
-    🎙️ Explorateur de podcasts
-    <span class="badge-count">0/20</span>
-  </div>
-  <div class="badge" id="badge-collectionneur">
-    🏆 Collectionneur
-    <span class="badge-count">0/5</span>
-  </div>
-  <div class="badge" id="badge-melomane">
-    🎧 Mélomane
-    <span class="badge-count">0/15</span>
-  </div>
-  <div class="badge" id="badge-geek">
-    🎮 Geek
-    <span class="badge-count">0/10</span>
-  </div>
-  <div class="badge" id="badge-joueur>">
-    🎲 Maître du jeu
-    <span class="badge-count">0/7</span>
-  </div>
-</div>
       </aside>
 
       <!-- Colonne droite: Liste -->
@@ -143,7 +144,7 @@
   </div>
 
   <footer>
-    <p>Prototype carnet ludique – Sauvegarde locale uniquement</p>
+    <p>Do You Know This ?  </p>
   </footer>
 
   <script src="script.js"></script>

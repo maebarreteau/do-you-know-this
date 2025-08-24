@@ -79,6 +79,7 @@ app.post("/entries", authenticateToken ,(req, res) => {
   const xpFromCategory = newEntry.getXPFromCategory();
 
   foundUser.addEntry(newEntry);
+  foundUser.updateBadges(newEntry);
   foundUser.xp += xpFromCategory;
 
   if(!foundUser.isWeeklyQuestDone && actualQuest.checkEntryValidQuest(newEntry))
@@ -86,10 +87,10 @@ app.post("/entries", authenticateToken ,(req, res) => {
     foundUser.isWeeklyQuestDone = true;
     foundUser.xp += actualQuest.reward;
 
-    return res.status(201).json({ ...newEntry, questDone: true, xpGained: foundUser.xp });
+    return res.status(201).json({ ...newEntry, questDone: true, xpGained: foundUser.xp, badges: foundUser.badges });
   }
 
-  return res.status(201).json({...newEntry, questDone: false, xpGained: foundUser.xp });
+  return res.status(201).json({...newEntry, questDone: false, xpGained: foundUser.xp, badges: foundUser.badges });
 })
 
 app.get('/quest', authenticateToken, (req, res) => {

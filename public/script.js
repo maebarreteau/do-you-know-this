@@ -23,14 +23,6 @@ function renderFilteredList() {
     });
 }
 
-const BADGES = [
-  { id: "cinephile", text: "Cinéphile : 10 films", condition: (stats) => stats.film >= 10 },
-  { id: "lecteur", text: "Lecteur assidu : 5 livres", condition: (stats) => stats.livre >= 5 },
-  { id: "explorateur", text: "Explorateur de podcasts : 20 podcasts", condition: (stats) => stats.podcast >= 20 },
-  { id: "collectionneur", text: "Collectionneur : 1 dans chaque catégorie", 
-    condition: (stats) => Object.values(stats).every(v => v > 0) }
-];
-
 // ==================== VARIABLES ====================
 let unlockedBadges = JSON.parse(localStorage.getItem("badges") || "[]");
 
@@ -45,7 +37,9 @@ const form = document.getElementById("entryForm");
 const list = document.getElementById("entries");
 const xpSpan = document.getElementById("xp");
 const levelSpan = document.getElementById("level");
+
 const badgesList = document.getElementById("badges");
+const badgesContainer = document.getElementById("badges-container");
 
 const questTextEl = document.getElementById("questText");
 const questStatusEl = document.getElementById("questStatus");
@@ -73,6 +67,15 @@ async function renderList() {
   entries.forEach(e => {
     const li = document.createElement("li");
     li.textContent = `${e.category} : ${e.title} (${e.date})`;
+
+    // 🔥 afficher les genres si présents
+    if (e.genres && e.genres.length > 0) {
+      const span = document.createElement("span");
+      span.style.marginLeft = "10px";
+      span.textContent = "Genres : " + e.genres.join(", ");
+      li.appendChild(span);
+    }
+
     list.appendChild(li);
   });
 }
@@ -90,19 +93,19 @@ function updateXPUI(newXP) {
   xpBar.style.width = percent + "%";
 }
 
-
-function updateBadges() {
-  const stats = {film:0, livre:0, podcast:0, musique:0, jeu:0};
-  //entries.forEach(e => stats[e.type]++);
-
-  BADGES.forEach(b => {
-    if(b.condition(stats) && !unlockedBadges.includes(b.id)){
-      unlockedBadges.push(b.id);
-      alert("🏅 Nouveau badge débloqué : " + b.text);
+function updateBadges(badges) {
+  // badges = nos badges
+  badges.forEach(b => {
+    if(b.condition === b.advancement){
+      alert("🏅 Nouveau badge débloqué : " + b.name);
     }
   });
 
-  badgesList.innerHTML = "";
+  let children = Array.from(badgesContainer.children);
+  children.forEach(c => {
+    let id = c.id;
+  });
+
   unlockedBadges.forEach(id => {
     const b = BADGES.find(x => x.id === id);
     const li = document.createElement("li");
@@ -141,11 +144,23 @@ async function renderQuest() {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const category = document.getElementById("category").value;
-  const title = document.getElementById("title").value;
-  const comment = document.getElementById("comment").value
-  if(!title) return;
+const title = document.getElementById("title").value;
+const comment = document.getElementById("comment").value;
+const rating = document.getElementById("rating").value; // 🔥 récupère la note
 
-  const entry = {category, title, date:new Date().toLocaleDateString(), comment};
+
+const genres = Array.from(document.querySelectorAll(".category-checkbox:checked"))
+                   .map(cb => cb.value);
+
+const entry = {
+  category,
+  title,
+  date: new Date().toLocaleDateString(),
+  comment,
+  rating, 
+  genres 
+};
+
 
   let token = localStorage.getItem("token");
   if(!token) return;
@@ -163,16 +178,42 @@ form.addEventListener("submit", async (e) => {
 
   const response = await res.json();
 
-  const li = document.createElement("li");
-  li.textContent = `${response.category} : ${response.title} (${response.date})`;
+const li = document.createElement("li");
+li.textContent = `${entry.category} : ${entry.title} (${entry.date})`;
+
+// afficher la note
+if(entry.rating){
+  li.textContent += ` - Note : ${entry.rating}/10`;
+}
+
+// afficher les genres
+if(entry.genres && entry.genres.length > 0){
+  li.textContent += ` - Genres : ${entry.genres.join(", ")}`;
+}
+
+list.appendChild(li);
+
+
+  // afficher les genres si présents
+  if (response.genres && response.genres.length > 0) {
+    const span = document.createElement("span");
+    span.style.marginLeft = "10px";
+    span.textContent = "Genres : " + response.genres.join(", ");
+    li.appendChild(span);
+  }
+
+  if(entry.comment){
+  li.textContent += ` - Commentaire : ${entry.comment}`;
+}
+
   list.appendChild(li);
 
   if(response.questDone) {
-    //alert("🎉 Quête accomplie ! Vous gagnez " + response.xpGained + " XP !");
     document.querySelector(".quest").classList.add("complete");
     questStatusEl.textContent = "✅ Quête réussie ! (+" + currentQuest.reward + " XP)";
   }
 
+  updateBadges(response.badges)
   updateXPUI(response.xpGained)
 })
 
@@ -186,19 +227,17 @@ clearBtn.addEventListener("click", () => {
     unlockedBadges = [];
     questDone = false;
 
+    save();
+    renderList();
+    updateXPUI();
+    updateBadges();
+    renderQuest();
 
-  save();
-  renderList();
-  updateXPUI();
-  updateBadges();
-  renderQuest();
-
-  form.reset();
-}});
+    form.reset();
+  }
+});
 
 // ==================== INIT ====================
 renderList();
 updateXPUI(0);
-updateBadges();
 renderQuest();
-
