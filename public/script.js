@@ -108,7 +108,7 @@ async function renderList() {
 
   entries.forEach(e => {
     const li = document.createElement("li");
-    li.textContent = `${e.type} : ${e.title} (${e.date})`;
+    li.textContent = `${e.category} : ${e.title} (${e.date})`;
     list.appendChild(li);
   });
 }
@@ -151,12 +151,12 @@ function renderQuest() {
 // ==================== AJOUT D'ENTRÉE ====================
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const type = document.getElementById("type").value;
+  const category = document.getElementById("category").value;
   const title = document.getElementById("title").value;
   const comment = document.getElementById("comment").value
   if(!title) return;
 
-  const entry = {type, title, date:new Date().toLocaleDateString(), comment};
+  const entry = {category, title, date:new Date().toLocaleDateString(), comment};
 
   let token = localStorage.getItem("token");
   if(!token) return;
@@ -164,11 +164,19 @@ form.addEventListener("submit", async (e) => {
   const res = await fetch('/entries', {
     method: 'POST',
     headers: {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'},
-    body: json.stringify(entry)
+    body: JSON.stringify(entry)
   })
 
-  // TODO
-  // handle response
+  if(res.status != 201) {
+    alert("Erreur lors de l'ajout de l'entrée. Veuillez réessayer.");
+    return;
+  }
+
+  const newEntry = await res.json();
+
+  const li = document.createElement("li");
+  li.textContent = `${newEntry.category} : ${newEntry.title} (${newEntry.date})`;
+  list.appendChild(li);
 })
 
 const clearBtn = document.getElementById("clearAll");

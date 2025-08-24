@@ -59,36 +59,23 @@ app.post('/register', (req, res) => {
   return res.status(200).json({ message: "Compte créé avec succès !" });
 });
 
-app.get('/entries', (req, res) => {
-  let token = req.headers['authorization'];
-  if(!token) return res.status(401).json({ message: "Token manquant." });
-  token = token.split(' ')[1]; // Bearer TOKEN
+app.get('/entries', authenticateToken, (req, res) => {
+  const foundUser = users.find(u => u.username === req.user.username);
+  if(!foundUser) return res.status(404).json({ message: "Utilisateur non trouvé." });
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if(err) return res.status(403).json({ message: "Token invalide." });
-
-    const foundUser = users.find(u => u.username === user.username);
-    if(!foundUser) return res.status(404).json({ message: "Utilisateur non trouvé." });
-
-    return res.status(200).json(foundUser.entries);
-  });
+  return res.status(200).json(foundUser.entries);
 })
 
-app.post("/entries", (req, res) => {
-  let token = req.headers['authorization'];
-  if(!token) return res.status(401).json({ message: "Token manquant." });
-  token = token.split(' ')[1]; // Bearer TOKEN
+app.post("/entries", authenticateToken ,(req, res) => {
+  const foundUser = users.find(u => u.username === req.user.username);
+  if(!foundUser) return res.status(404).json({ message: "Utilisateur non trouvé." });
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if(err) return res.status(403).json({ message: "Token invalide." });
+  const { category, title, date, comment } = req.body;
+  if(!category || !title || !date) return res.status(400).json({ message: "Champs manquants." });
 
-    const foundUser = users.find(u => {u.username === user.username})
-    if(!foundUser) return res.status(404).json({ message: "Utilisateur non trouvé." });
-
-    // TODO
-    // wip
-    foundUser.addEntry(new Entry(req.body.title, req.body.date, req.body.types || [], ))
-  })
+  const newEntry = new Entry(title, date, [], category, comment || "", 10);
+  foundUser.addEntry(newEntry);
+  return res.status(201).json(newEntry);
 })
 
 // Middleware pour protéger les routes

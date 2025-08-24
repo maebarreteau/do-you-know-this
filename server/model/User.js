@@ -8,7 +8,6 @@ class User {
 
     addEntry(entry) {
         this.entries.push(entry)
-        return this.entries
     }
 }
 
