@@ -7,11 +7,8 @@ const XP_VALUES = {
   jeu: 40
 };
 
-const checkboxes = document.querySelectorAll('.category-checkbox');
-const entriesList = document.getElementById('list'); // ta liste d'entrées
-
-checkboxes.forEach(box => {
-  box.addEventListener('change', renderFilteredList);
+document.querySelector('.dropdown-btn').addEventListener('click', function() {
+  document.querySelector('.dropdown-multi').classList.toggle('show');
 });
 
 function renderFilteredList() {

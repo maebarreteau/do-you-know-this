@@ -46,6 +46,7 @@
                 <option value="musique">🎧 Musique</option>
                 <option value="podcast">🎙️ Podcast</option>
                 <option value="jeu">🎲 Jeu de société</option>
+                <option value="jeu-video">🎮 Jeu vidéo</option>
               </select>
             </div>
             <div>
@@ -64,24 +65,26 @@
             </div>
           </div>
 
-        <h2>Catégories</h2>
-<div class="categories">
-  <label><span>SF</span><input type="checkbox" value="sf" class="category-checkbox"></label>
-  <label><span>Humour</span><input type="checkbox" value="humour" class="category-checkbox"></label>
-  <label><span>Drame</span><input type="checkbox" value="drame" class="category-checkbox"></label>
-  <label><span>Aventure</span><input type="checkbox" value="aventure" class="category-checkbox"></label>
-  <label><span>Mystère</span><input type="checkbox" value="mystere" class="category-checkbox"></label>
-  <label><span>Romance</span><input type="checkbox" value="romance" class="category-checkbox"></label>
-  <label><span>Horreur</span><input type="checkbox" value="horreur" class="category-checkbox"></label>
-  <label><span>Documentaire</span><input type="checkbox" value="document class="category-checkbox"></label>
-  <label><span>Biographie</span><input type="checkbox" value="biographie" class="category-checkbox"></label>
-  <label><span>Fantastique</span><input type="checkbox" value="fantastique" class="category-checkbox"></label>
-  <label><span>Historique</span><input type="checkbox" value="historique" class="category-checkbox"></label>
-  <label><span>Policier</span><input type="checkbox" value="policier" class="category-checkbox"></label>
-  <label><span>Thriller</span><input type="checkbox" value="thriller" class="category-checkbox"></label>
-  <label><span>Classique</span><input type="checkbox" value="classique" class="category-checkbox"></label>
-  <label><span>Autre</span><input type="checkbox" value="autre" class="category-checkbox"></label>  
-  
+       <label for="categories">Genre</label>       
+<div class="dropdown-multi">
+  <button class="dropdown-btn">Sélectionner les genres</button>
+  <div class="dropdown-content">
+    <label><input type="checkbox" value="sf" class="category-checkbox"> SF</label>
+    <label><input type="checkbox" value="humour" class="category-checkbox"> Humour</label>
+    <label><input type="checkbox" value="drame" class="category-checkbox"> Drame</label>
+    <label><input type="checkbox" value="aventure" class="category-checkbox"> Aventure</label>
+    <label><input type="checkbox" value="mystere" class="category-checkbox"> Mystère</label>
+    <label><input type="checkbox" value="romance" class="category-checkbox"> Romance</label>
+    <label><input type="checkbox" value="horreur" class="category-checkbox"> Horreur</label>
+    <label><input type="checkbox" value="documentaire" class="category-checkbox"> Documentaire</label>
+    <label><input type="checkbox" value="biographie" class="category-checkbox"> Biographie</label>
+    <label><input type="checkbox" value="fantastique" class="category-checkbox"> Fantastique</label>
+    <label><input type="checkbox" value="historique" class="category-checkbox"> Historique</label>
+    <label><input type="checkbox" value="policier" class="category-checkbox"> Policier</label>
+    <label><input type="checkbox" value="thriller" class="category-checkbox"> Thriller</label>
+    <label><input type="checkbox" value="classique" class="category-checkbox"> Classique</label>
+    <label><input type="checkbox" value="autre" class="category-checkbox"> Autre</label>
+  </div>
 </div>
 
 
@@ -115,6 +118,18 @@
   <div class="badge" id="badge-collectionneur">
     🏆 Collectionneur
     <span class="badge-count">0/5</span>
+  </div>
+  <div class="badge" id="badge-melomane">
+    🎧 Mélomane
+    <span class="badge-count">0/15</span>
+  </div>
+  <div class="badge" id="badge-geek">
+    🎮 Geek
+    <span class="badge-count">0/10</span>
+  </div>
+  <div class="badge" id="badge-joueur>">
+    🎲 Maître du jeu
+    <span class="badge-count">0/7</span>
   </div>
 </div>
       </aside>
